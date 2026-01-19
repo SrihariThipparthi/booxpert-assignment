@@ -68,25 +68,26 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 echo.
-echo =========================================
-echo SUCCESS: Setup Complete!
-echo =========================================
+echo Starting Backend & Frontend
+
+REM Start FastAPI backend in new window
+echo Starting FastAPI backend...
+start "FastAPI Backend" cmd /k ^
+uvicorn backend.api_handler:app --host 0.0.0.0 --port 8000 --reload
+
+REM Give backend time to start
+timeout /t 60 >nul
+
+REM Start Streamlit frontend in new window
+echo Starting Streamlit frontend...
+start "Streamlit Frontend" cmd /k ^
+streamlit run frontend\app.py
+
 echo.
-echo TO START MANUALLY IN TWO TERMINALS:
+echo Setup Complete!
 echo.
-echo Terminal 1 (Backend):
-echo   venv\Scripts\activate
-echo   uvicorn backend.api_handler:app --host 0.0.0.0 --port 8000 --reload
+echo Backend   : http://localhost:8000/docs
+echo Frontend : http://localhost:8501
 echo.
-echo Terminal 2 (Frontend):
-echo   venv\Scripts\activate
-echo   streamlit run frontend\app.py
-echo.
-echo ONCE RUNNING, ACCESS AT:
-echo   Backend API: http://localhost:8000
-echo   API Docs:    http://localhost:8000/docs
-echo   Frontend UI: http://localhost:8501
-echo.
-echo =========================================
 echo.
 pause
