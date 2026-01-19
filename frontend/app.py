@@ -86,13 +86,11 @@ def display_task1():
         st.write("")
         search_button = st.button(" Find Similar Names", use_container_width=True)
 
-    # Sample names
     st.info(" **Try these examples:** Gita, Mohammad, Prya, Kris, Sandeep, Lakshmi")
 
     if search_button and name_input:
         with st.spinner("Searching for similar names..."):
             try:
-                # Call API
                 response = requests.post(
                     f"{API_BASE_URL}/api/match-names",
                     json={"name": name_input},
@@ -102,7 +100,6 @@ def display_task1():
                 if response.status_code == 200:
                     data = response.json()
 
-                    # Display best match
                     st.markdown("### Best Match")
                     best_match = data["best_match"]
                     st.markdown(
@@ -117,10 +114,8 @@ def display_task1():
                         unsafe_allow_html=True,
                     )
 
-                    # Display all matches
                     st.markdown("### All Matches (Ranked)")
 
-                    # Create columns for better layout
                     for i, match in enumerate(data["all_matches"], 1):
                         col1, col2, col3 = st.columns([1, 3, 2])
 
@@ -131,7 +126,6 @@ def display_task1():
                             st.markdown(f"**{match['name']}**")
 
                         with col3:
-                            # Progress bar for score
                             score_pct = match["score"]
                             st.progress(score_pct)
                             st.caption(f"Score: {score_pct:.1%}")
@@ -139,7 +133,6 @@ def display_task1():
                         if i < len(data["all_matches"]):
                             st.divider()
 
-                    # Additional info
                     st.success(
                         f"Found {len(data['all_matches'])} matching names for '{name_input}'"
                     )
@@ -159,14 +152,12 @@ def display_task1():
 
 
 def display_task2():
-    """Display Task 2: Recipe Chatbot"""
     st.markdown(
         '<div class="task-header">🍳 Task 2: Recipe Chatbot</div>',
         unsafe_allow_html=True,
     )
     st.write("Get personalized recipe suggestions based on the ingredients you have!")
 
-    # Input section
     col1, col2 = st.columns([3, 1])
 
     with col1:
@@ -178,12 +169,11 @@ def display_task2():
         )
 
     with col2:
-        st.write("")  # Spacer
-        st.write("")  # Spacer
-        st.write("")  # Spacer
+        st.write("")  
+        st.write("")
+        st.write("")
         recipe_button = st.button("Get Recipe Suggestions", use_container_width=True)
 
-    # Sample ingredients
     st.info(
         "**Try these examples:** egg, onions | chicken, rice | tomato, pasta | potato, onion"
     )
@@ -191,29 +181,24 @@ def display_task2():
     if recipe_button and ingredients_input:
         with st.spinner("Cooking up recipe suggestions..."):
             try:
-                # Call API
                 response = requests.post(
                     f"{API_BASE_URL}/api/get-recipe",
                     json={"ingredients": ingredients_input},
-                    timeout=300,  # Longer timeout for LLM
+                    timeout=300,
                 )
 
                 if response.status_code == 200:
                     data = response.json()
 
-                    # Display recipe
                     st.markdown("### Recipe Suggestion")
 
-                    # Show which method was used
-                    if data["generated_by"] == "ollama":
-                        st.success("Generated using Local LLM (Ollama)")
+                    if data["generated_by"] == "recipe-lora":
+                        st.success("Generated using custom lora")
                     else:
                         st.info("Retrieved from Recipe Database")
 
-                    # Fix: Replace newlines before using in HTML
                     recipe_html = data["recipe"].replace("\n", "<br>")
 
-                    # Display recipe in a card - FIXED: don't use f-string with backslash
                     st.markdown(
                         f"""
                     <div class="recipe-card">
@@ -223,7 +208,6 @@ def display_task2():
                         unsafe_allow_html=True,
                     )
 
-                    # Additional tips
                     with st.expander("Cooking Tips"):
                         st.write("""
                         - Always prep ingredients before cooking
@@ -251,15 +235,11 @@ def display_task2():
 
 
 def main():
-    """Main application"""
-
-    # Header
     st.markdown(
         '<div class="main-header"> Name Matching & Recipe Chatbot System</div>',
         unsafe_allow_html=True,
     )
 
-    # Check API health
     api_status = check_api_health()
 
     if api_status:
@@ -269,7 +249,6 @@ def main():
         st.code("cd backend\npython api.py", language="bash")
         st.stop()
 
-    # Sidebar for task selection
     st.sidebar.title("Select Task")
     st.sidebar.write("Choose which functionality you want to test:")
 
@@ -279,7 +258,6 @@ def main():
 
     st.sidebar.divider()
 
-    # About section in sidebar
     st.sidebar.title("About")
     st.sidebar.info("""
     **Task 1:** Uses fuzzy matching and semantic similarity (BERT embeddings) to find similar names.
@@ -289,11 +267,9 @@ def main():
 
     st.sidebar.divider()
 
-    # API info
     st.sidebar.title(" API Info")
     st.sidebar.code(f"Backend: {API_BASE_URL}", language="text")
 
-    # Display selected task
     st.divider()
 
     if task_choice == "Task 1: Name Matching":
@@ -301,7 +277,6 @@ def main():
     else:
         display_task2()
 
-    # Footer
     st.divider()
     st.markdown(
         """
